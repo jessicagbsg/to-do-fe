@@ -1,7 +1,7 @@
+import { Search } from "lucide-react";
 import { Note } from "@/components/Note";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Search } from "lucide-react";
+import { CreateNote } from "../../components/CreateNote";
 
 export const Home = () => {
   const notes = [
@@ -30,13 +30,7 @@ export const Home = () => {
           <div className="text-muted-foreground flex items-center gap-x-2">
             <h1 className="text-lg font-semibold">Notes</h1>
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => notes.push({ id: 3, title: "new note", todos: [] })}
-          >
-            <PlusCircle className="h-4 w-4" />
-            Create a new note
-          </Button>
+          <CreateNote />
         </div>
         <div className="w-full my-5 md:w-1/4 self-end">
           <Search className="absolute text-muted-foreground h-5 w-5 ml-2 mt-2" />
