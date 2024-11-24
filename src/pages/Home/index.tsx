@@ -40,7 +40,7 @@ export const Home = () => {
         <div className="h-full w-full overflow-x-auto pb-6">
           <div className="flex gap-6 w-full flex-wrap">
             {notes.map((note, index) => (
-              <Note key={index} id={note.id} title={note.title} todos={note.todos} />
+              <Note key={index} note={note} />
             ))}
           </div>
         </div>

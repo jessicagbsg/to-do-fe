@@ -9,3 +9,5 @@ type NoteModel = {
   title: string;
   todos: Todo[];
 };
+
+type FilterType = "all" | "completed" | "notCompleted";

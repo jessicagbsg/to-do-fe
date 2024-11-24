@@ -3,20 +3,20 @@ import { Trash } from "lucide-react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { NoteBody } from "../NoteBody";
 
-export const Note = ({ id, title, todos }: Props) => {
+export const Note = ({ note }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <div
-          key={`note-${id}`}
+          key={`note-${note.id}`}
           onClick={() => console.log("clicked")}
           className={`flex flex-col min-w-44 w-full max-w-full sm:max-w-56 h-44 
          gap-y-2 p-4 cursor-pointer bg-secondary/10 rounded-lg shadow-md`}
         >
-          <h4 className="text-base font-semibold text-primary line-clamp-1">{title}</h4>
+          <h4 className="text-base font-semibold text-primary line-clamp-1">{note.title}</h4>
           <div className="flex flex-col mt-2 h-full justify-between">
             <div className="flex flex-col gap-y-1 w-full">
-              {todos.map((todo, index) => (
+              {note.todos.map((todo, index) => (
                 <div
                   key={`todo-${index}`}
                   className={cn(
@@ -38,13 +38,11 @@ export const Note = ({ id, title, todos }: Props) => {
           </div>
         </div>
       </DialogTrigger>
-      <NoteBody />
+      <NoteBody isEditing />
     </Dialog>
   );
 };
 
 type Props = {
-  id: number;
-  title: string;
-  todos: { text: string; done: boolean }[];
+  note: NoteModel;
 };
