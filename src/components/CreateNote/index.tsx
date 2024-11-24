@@ -1,7 +1,7 @@
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { NoteBody } from "../NoteBody";
+import { Note } from "../Note";
 
 export const CreateNote = () => {
   return (
@@ -12,7 +12,7 @@ export const CreateNote = () => {
           Create a new note
         </Button>
       </DialogTrigger>
-      <NoteBody />
+      <Note />
     </Dialog>
   );
 };

@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { Note } from "@/components/Note";
+import { EditNote } from "@/components/EditNote";
 import { Input } from "@/components/ui/input";
 import { CreateNote } from "../../components/CreateNote";
 
@@ -40,7 +40,7 @@ export const Home = () => {
         <div className="h-full w-full overflow-x-auto pb-6">
           <div className="flex gap-6 w-full flex-wrap">
             {notes.map((note, index) => (
-              <Note key={index} note={note} />
+              <EditNote key={index} note={note} />
             ))}
           </div>
         </div>
