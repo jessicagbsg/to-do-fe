@@ -1,30 +1,21 @@
-import { Search } from "lucide-react";
+import { Loader, Search } from "lucide-react";
+import { useQuery } from "@apollo/client";
 import { EditNote } from "@/components/EditNote";
 import { Input } from "@/components/ui/input";
+import { FETCH_NOTES } from "@/graphql/queries/fetchAllNotes";
 import { CreateNote } from "../../components/CreateNote";
 
+type NoteQuery = {
+  notes: NoteModel[];
+};
+
 export const Home = () => {
-  const notes = [
-    {
-      id: 1,
-      title: "Note 1",
-      todos: [
-        { id: 1, text: "Todo 1", done: true },
-        { id: 2, text: "Todo 2", done: false },
-      ],
-    },
-    {
-      id: 2,
-      title: "Note 2",
-      todos: [
-        { id: 3, text: "Todo 1", done: false },
-        { id: 4, text: "Todo 2", done: true },
-      ],
-    },
-  ];
+  const { loading, error, data } = useQuery<NoteQuery>(FETCH_NOTES);
+
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <>
+    <div className="p-8">
       <div className="h-full flex flex-col">
         <div className="flex w-full items-center justify-between">
           <div className="text-muted-foreground flex items-center gap-x-2">
@@ -37,14 +28,18 @@ export const Home = () => {
           <Input type="text" placeholder="Search notes by title" className="pl-10 max-w-sm" />
         </div>
 
-        <div className="h-full w-full overflow-x-auto pb-6">
-          <div className="flex gap-6 w-full flex-wrap">
-            {notes.map((note, index) => (
-              <EditNote key={index} note={note} />
-            ))}
+        {loading ? (
+          <div className="h-full w-full flex items-center justify-center">
+            <Loader />
           </div>
-        </div>
+        ) : (
+          <div className="h-full w-full overflow-x-auto pb-6">
+            <div className="flex gap-6 w-full flex-wrap">
+              {data?.notes && data.notes.map((note, index) => <EditNote key={index} note={note} />)}
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };

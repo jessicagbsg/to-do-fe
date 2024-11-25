@@ -4,6 +4,7 @@ import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Trash } from "lucide-react";
 import { DialogContent } from "../ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 type Props = {
   isEditing?: boolean;
@@ -42,7 +43,11 @@ export const Note = ({ isEditing = false }: Props) => {
   });
 
   return (
-    <DialogContent className="sm:max-w-[425px] md:max-w-none md:w-2/3 md:h-4/5 flex flex-col min-h-0">
+    <DialogContent
+      aria-describedby={undefined}
+      className="sm:max-w-[425px] md:max-w-none md:w-2/3 md:h-4/5 flex flex-col min-h-0"
+    >
+      <DialogTitle className="text-sm text-secondary-foreground">Note</DialogTitle>
       <div
         className={cn([
           "grid h-full mt-4 gap-3 min-h-0",
