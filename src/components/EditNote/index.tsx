@@ -1,7 +1,6 @@
-import { cn } from "@/lib/utils";
 import { Trash } from "lucide-react";
-import { Dialog, DialogTrigger } from "../ui/dialog";
-import { Note } from "../Note";
+import { cn } from "@/lib/utils";
+import { Note, Dialog, DialogTrigger } from "@/components";
 
 type Props = {
   note: NoteModel;

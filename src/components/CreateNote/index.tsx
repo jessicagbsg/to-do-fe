@@ -1,7 +1,5 @@
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { Note } from "../Note";
+import { Dialog, DialogTrigger, Button, Note } from "@/components";
 
 export const CreateNote = () => {
   return (

@@ -1,9 +1,7 @@
 import { Loader, Search } from "lucide-react";
 import { useQuery } from "@apollo/client";
-import { EditNote } from "@/components/EditNote";
-import { Input } from "@/components/ui/input";
+import { EditNote, Input, CreateNote } from "@/components";
 import { FETCH_NOTES } from "@/graphql/queries/fetchAllNotes";
-import { CreateNote } from "../../components/CreateNote";
 
 type NoteQuery = {
   notes: NoteModel[];
@@ -28,11 +26,13 @@ export const Home = () => {
           <Input type="text" placeholder="Search notes by title" className="pl-10 max-w-sm" />
         </div>
 
-        {loading ? (
+        {loading && (
           <div className="h-full w-full flex items-center justify-center">
             <Loader />
           </div>
-        ) : (
+        )}
+
+        {data && (
           <div className="h-full w-full overflow-x-auto pb-6">
             <div className="flex gap-6 w-full flex-wrap">
               {data?.notes && data.notes.map((note, index) => <EditNote key={index} note={note} />)}
