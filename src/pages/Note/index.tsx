@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Trash } from "lucide-react";
 import { ClipLoader } from "react-spinners";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Checkbox, NoteTitle } from "@/components";
-import { FETCH_NOTE, NoteQuery } from "@/graphql";
+import { Button, Checkbox, NoteTitle, AddTodoInput } from "@/components";
+import { CREATE_TODO, FETCH_NOTE, NoteQuery } from "@/graphql";
 import { cn } from "@/lib/utils";
 
 export const Note = () => {
@@ -14,9 +14,22 @@ export const Note = () => {
     variables: { id: noteId },
     skip: !noteId,
   });
+  const [createTodo] = useMutation(CREATE_TODO, {
+    update(cache, { data: { createTodo } }) {
+      cache.modify({
+        fields: {
+          note(existingNote = {}) {
+            return {
+              ...existingNote,
+              todos: [...(existingNote.todos || []), createTodo.todo],
+            };
+          },
+        },
+      });
+    },
+  });
 
   const [todos, setTodos] = useState<TodoModel[]>([]);
-  const [todoInput, setTodoInput] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
 
   const filteredTodos = todos.filter((todo) => {
@@ -25,16 +38,13 @@ export const Note = () => {
     return true;
   });
 
-  const handleAddTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && todoInput.trim() !== "") {
-      setTodos((prev) => [...prev, { id: prev.length + 1, title: todoInput, done: false }]);
-      setTodoInput("");
-    }
-  };
-
   useEffect(() => {
     if (data) setTodos(data.note.todos);
   }, [data]);
+
+  const handleAddTodo = (newTodo: TodoModel) => {
+    setTodos((prev) => [...prev, newTodo]);
+  };
 
   if (loading)
     return (
@@ -117,14 +127,7 @@ export const Note = () => {
           ))}
         </div>
 
-        <input
-          type="text"
-          className="mt-4 w-full border-b border-gray-300 text-lg focus:outline-none focus:border-gray-500"
-          placeholder="Add a to-do and press Enter"
-          value={todoInput}
-          onChange={(e) => setTodoInput(e.target.value)}
-          onKeyDown={handleAddTodo}
-        />
+        <AddTodoInput noteId={noteId!} createTodo={createTodo} onAddTodo={handleAddTodo} />
       </div>
     </div>
   );

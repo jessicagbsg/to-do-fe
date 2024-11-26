@@ -1,2 +1,2 @@
 export { UPDATE_NOTE } from "./updateNote";
-export type { NoteMutation } from "./updateNote";
+export { CREATE_TODO } from "./createTodo";
