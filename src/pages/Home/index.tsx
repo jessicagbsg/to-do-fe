@@ -1,16 +1,19 @@
-import { Loader, Search } from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
+import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { EditNote, Input, CreateNote } from "@/components";
-import { FETCH_NOTES } from "@/graphql/queries/fetchAllNotes";
-
-type NoteQuery = {
-  notes: NoteModel[];
-};
+import { Input, Button, EditNote } from "@/components";
+import { FETCH_NOTES, NotesQuery } from "@/graphql";
 
 export const Home = () => {
-  const { loading, error, data } = useQuery<NoteQuery>(FETCH_NOTES);
+  const navigate = useNavigate();
+  const { loading, error, data } = useQuery<NotesQuery>(FETCH_NOTES);
 
   if (error) return <p>Error: {error.message}</p>;
+
+  const createNote = () => {
+    navigate("/1");
+  };
 
   return (
     <div className="p-8">
@@ -19,7 +22,10 @@ export const Home = () => {
           <div className="text-muted-foreground flex items-center gap-x-2">
             <h1 className="text-lg font-semibold">Notes</h1>
           </div>
-          <CreateNote />
+          <Button variant="ghost" onClick={createNote}>
+            <PlusCircle className="h-4 w-4" />
+            Create a new note
+          </Button>
         </div>
         <div className="w-full my-5 md:w-1/4 self-end">
           <Search className="absolute text-muted-foreground h-5 w-5 ml-2 mt-2" />
@@ -28,14 +34,16 @@ export const Home = () => {
 
         {loading && (
           <div className="h-full w-full flex items-center justify-center">
-            <Loader />
+            <ClipLoader loading={loading} size={50} />
           </div>
         )}
 
         {data && (
           <div className="h-full w-full overflow-x-auto pb-6">
             <div className="flex gap-6 w-full flex-wrap">
-              {data?.notes && data.notes.map((note, index) => <EditNote key={index} note={note} />)}
+              {data.notes.map((note, index) => (
+                <EditNote key={index} note={note} />
+              ))}
             </div>
           </div>
         )}

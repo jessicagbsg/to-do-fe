@@ -1,16 +1,21 @@
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
+import { useEffect, useState } from "react";
+import { Button } from "../../components/ui/button";
+import { Checkbox } from "../../components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { Trash } from "lucide-react";
-import { DialogContent } from "../ui/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import { ArrowLeft, Trash } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { FETCH_NOTE, NoteQuery } from "@/graphql";
+import { ClipLoader } from "react-spinners";
 
-type Props = {
-  isEditing?: boolean;
-};
+export const Note = () => {
+  const navigate = useNavigate();
+  const { noteId } = useParams<{ noteId: string }>();
+  const { loading, error, data } = useQuery<NoteQuery>(FETCH_NOTE, {
+    variables: { id: noteId },
+    skip: !noteId,
+  });
 
-export const Note = ({ isEditing = false }: Props) => {
   const [title, setTitle] = useState("");
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [todoInput, setTodoInput] = useState("");
@@ -23,18 +28,12 @@ export const Note = ({ isEditing = false }: Props) => {
     }
   };
 
-  const handleSave = () => {
-    if (title.trim() === "") return;
-    if (isEditing) {
-      // Save
-    } else {
-      // Create
+  useEffect(() => {
+    if (data) {
+      setTitle(data.note.title);
+      setTodos(data.note.todos);
     }
-    setTitle("");
-    setTodos([]);
-    setTodoInput("");
-    setFilter("all");
-  };
+  }, [data]);
 
   const filteredTodos = todos.filter((todo) => {
     if (filter === "completed") return todo.done;
@@ -42,16 +41,30 @@ export const Note = ({ isEditing = false }: Props) => {
     return true;
   });
 
+  if (loading)
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <ClipLoader loading={loading} size={50} />
+      </div>
+    );
+
+  if (error) return <p>Error: {error.message}</p>;
+
   return (
-    <DialogContent
-      aria-describedby={undefined}
-      className="sm:max-w-[425px] md:max-w-none md:w-2/3 md:h-4/5 flex flex-col min-h-0"
-    >
-      <DialogTitle className="text-sm text-secondary-foreground">Note</DialogTitle>
+    <div className="flex flex-col h-full w-full max-w-screen-lg mx-auto p-8 pb-16">
+      <Button
+        onClick={() => navigate("/")}
+        variant={"ghost"}
+        className="self-start flex items-center text-muted-foreground gap"
+      >
+        <ArrowLeft className="h-4 w-4 " />
+        <span>Back</span>
+      </Button>
+
       <div
         className={cn([
           "grid h-full mt-4 gap-3 min-h-0",
-          isEditing ? "grid-rows-[auto_auto_1fr_auto_auto]" : "grid-rows-[auto_1fr_auto_auto]",
+          !!todos.length ? "grid-rows-[auto_auto_1fr_auto]" : "grid-rows-[auto_1fr_auto]",
         ])}
       >
         <div className="mb-4">
@@ -65,7 +78,7 @@ export const Note = ({ isEditing = false }: Props) => {
           />
         </div>
 
-        {isEditing && (
+        {!!todos.length && (
           <div className="flex justify-start gap-x-2">
             <Button
               variant={filter === "all" ? "default" : "ghost"}
@@ -108,12 +121,10 @@ export const Note = ({ isEditing = false }: Props) => {
                 <p className="text-sm text-muted-foreground line-clamp-1">{todo.title}</p>
               </div>
 
-              {isEditing && (
-                <Trash
-                  className="self-end h-4 w-4 text-muted-foreground cursor-pointer"
-                  onClick={() => setTodos((prev) => prev.filter((t) => t.id !== todo.id))}
-                />
-              )}
+              <Trash
+                className="self-end h-4 w-4 text-muted-foreground cursor-pointer"
+                onClick={() => setTodos((prev) => prev.filter((t) => t.id !== todo.id))}
+              />
             </div>
           ))}
         </div>
@@ -126,11 +137,7 @@ export const Note = ({ isEditing = false }: Props) => {
           onChange={(e) => setTodoInput(e.target.value)}
           onKeyDown={handleAddTodo}
         />
-
-        <Button className="justify-self-end w-fit mt-4" onClick={handleSave}>
-          Save
-        </Button>
       </div>
-    </DialogContent>
+    </div>
   );
 };
