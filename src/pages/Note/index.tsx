@@ -4,8 +4,9 @@ import { ClipLoader } from "react-spinners";
 import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Checkbox, NoteTitle, AddTodoInput } from "@/components";
-import { CREATE_TODO, FETCH_NOTE, NoteQuery } from "@/graphql";
+import { CREATE_TODO, DELETE_TODO, FETCH_NOTE, NoteQuery } from "@/graphql";
 import { cn } from "@/lib/utils";
+import { NoteFilters } from "@/components/NoteFilters";
 
 export const Note = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export const Note = () => {
     variables: { id: noteId },
     skip: !noteId,
   });
+
   const [createTodo] = useMutation(CREATE_TODO, {
     update(cache, { data: { createTodo } }) {
       cache.modify({
@@ -27,6 +29,10 @@ export const Note = () => {
         },
       });
     },
+  });
+
+  const [deleteTodo] = useMutation(DELETE_TODO, {
+    refetchQueries: [{ query: FETCH_NOTE, variables: { id: noteId } }],
   });
 
   const [todos, setTodos] = useState<TodoModel[]>([]);
@@ -44,6 +50,15 @@ export const Note = () => {
 
   const handleAddTodo = (newTodo: TodoModel) => {
     setTodos((prev) => [...prev, newTodo]);
+  };
+
+  const handleDeleteTodo = async (id: number) => {
+    try {
+      await deleteTodo({ variables: { id } });
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
   };
 
   if (loading)
@@ -76,28 +91,7 @@ export const Note = () => {
           {data && <NoteTitle noteId={noteId!} initialTitle={data.note.title} />}
         </div>
 
-        {!!todos.length && (
-          <div className="flex justify-start gap-x-2">
-            <Button
-              variant={filter === "all" ? "default" : "ghost"}
-              onClick={() => setFilter("all")}
-            >
-              All
-            </Button>
-            <Button
-              variant={filter === "completed" ? "default" : "ghost"}
-              onClick={() => setFilter("completed")}
-            >
-              Completed
-            </Button>
-            <Button
-              variant={filter === "notCompleted" ? "default" : "ghost"}
-              onClick={() => setFilter("notCompleted")}
-            >
-              Not Completed
-            </Button>
-          </div>
-        )}
+        {!!todos.length && <NoteFilters filter={filter} setFilter={setFilter} />}
 
         <div className="flex flex-col gap-3 overflow-y-auto mt-3 custom-scrollbar">
           {filteredTodos.map((todo) => (
@@ -121,7 +115,7 @@ export const Note = () => {
 
               <Trash
                 className="self-end h-4 w-4 text-muted-foreground cursor-pointer"
-                onClick={() => setTodos((prev) => prev.filter((t) => t.id !== todo.id))}
+                onClick={() => handleDeleteTodo(Number(todo.id))}
               />
             </div>
           ))}
