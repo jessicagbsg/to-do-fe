@@ -4,7 +4,7 @@ import { ClipLoader } from "react-spinners";
 import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Checkbox, NoteTitle, AddTodoInput } from "@/components";
-import { CREATE_TODO, DELETE_TODO, FETCH_NOTE, NoteQuery } from "@/graphql";
+import { CREATE_TODO, DELETE_TODO, FETCH_NOTE, UPDATE_TODO, NoteQuery } from "@/graphql";
 import { cn } from "@/lib/utils";
 import { NoteFilters } from "@/components/NoteFilters";
 
@@ -35,6 +35,10 @@ export const Note = () => {
     refetchQueries: [{ query: FETCH_NOTE, variables: { id: noteId } }],
   });
 
+  const [updateTodo] = useMutation(UPDATE_TODO, {
+    refetchQueries: [{ query: FETCH_NOTE, variables: { id: noteId } }],
+  });
+
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
 
@@ -58,6 +62,15 @@ export const Note = () => {
       setTodos((prev) => prev.filter((todo) => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
+    }
+  };
+
+  const handleUpdateTodo = async (id: number, done: boolean) => {
+    try {
+      await updateTodo({ variables: { id, done } });
+      setTodos((prev) => prev.map((todo) => (todo.id === id ? { ...todo, done } : todo)));
+    } catch (error) {
+      console.error("Error updating todo:", error);
     }
   };
 
@@ -104,11 +117,7 @@ export const Note = () => {
               >
                 <Checkbox
                   checked={todo.done}
-                  onClick={() => {
-                    setTodos((prev) =>
-                      prev.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t))
-                    );
-                  }}
+                  onClick={() => handleUpdateTodo(todo.id, !todo.done)}
                 />
                 <p className="text-sm text-muted-foreground line-clamp-1">{todo.title}</p>
               </div>
