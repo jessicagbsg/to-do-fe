@@ -1,18 +1,31 @@
 import { PlusCircle, Search } from "lucide-react";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Input, Button, EditNote } from "@/components";
-import { FETCH_NOTES, NotesQuery } from "@/graphql";
+import { CREATE_NOTE, FETCH_NOTES, NotesQuery } from "@/graphql";
 
 export const Home = () => {
   const navigate = useNavigate();
   const { loading, error, data } = useQuery<NotesQuery>(FETCH_NOTES);
-
+  const [createNote] = useMutation(CREATE_NOTE, {
+    refetchQueries: [{ query: FETCH_NOTES }],
+    onCompleted: (data) => {
+      const newNoteId = data.createNote.note.id;
+      navigate(`/${newNoteId}`);
+    },
+    onError: (err) => {
+      console.error("Error creating note:", err);
+    },
+  });
   if (error) return <p>Error: {error.message}</p>;
 
-  const createNote = () => {
-    navigate("/1");
+  const handleCreateNote = async () => {
+    try {
+      await createNote({ variables: { title: "New Note" } });
+    } catch (error) {
+      console.error("Error creating note:", error);
+    }
   };
 
   return (
@@ -22,7 +35,7 @@ export const Home = () => {
           <div className="text-muted-foreground flex items-center gap-x-2">
             <h1 className="text-lg font-semibold">Notes</h1>
           </div>
-          <Button variant="ghost" onClick={createNote}>
+          <Button variant="ghost" onClick={handleCreateNote}>
             <PlusCircle className="h-4 w-4" />
             Create a new note
           </Button>
