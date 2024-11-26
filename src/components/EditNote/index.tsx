@@ -1,4 +1,3 @@
-import { Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -40,8 +39,6 @@ export const EditNote = ({ note }: Props) => {
             </div>
           ))}
         </div>
-
-        <Trash className="self-end h-4 w-4 text-muted-foreground" />
       </div>
     </div>
   );
