@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../components/ui/button";
-import { Checkbox } from "../../components/ui/checkbox";
-import { cn } from "@/lib/utils";
 import { ArrowLeft, Trash } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
-import { FETCH_NOTE, NoteQuery } from "@/graphql";
 import { ClipLoader } from "react-spinners";
+import { useQuery } from "@apollo/client";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button, Checkbox, NoteTitle } from "@/components";
+import { FETCH_NOTE, NoteQuery } from "@/graphql";
+import { cn } from "@/lib/utils";
 
 export const Note = () => {
   const navigate = useNavigate();
@@ -16,10 +15,15 @@ export const Note = () => {
     skip: !noteId,
   });
 
-  const [title, setTitle] = useState("");
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [todoInput, setTodoInput] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
+
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "completed") return todo.done;
+    if (filter === "notCompleted") return !todo.done;
+    return true;
+  });
 
   const handleAddTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && todoInput.trim() !== "") {
@@ -29,17 +33,8 @@ export const Note = () => {
   };
 
   useEffect(() => {
-    if (data) {
-      setTitle(data.note.title);
-      setTodos(data.note.todos);
-    }
+    if (data) setTodos(data.note.todos);
   }, [data]);
-
-  const filteredTodos = todos.filter((todo) => {
-    if (filter === "completed") return todo.done;
-    if (filter === "notCompleted") return !todo.done;
-    return true;
-  });
 
   if (loading)
     return (
@@ -68,14 +63,7 @@ export const Note = () => {
         ])}
       >
         <div className="mb-4">
-          <input
-            type="text"
-            className={`w-full border-b border-gray-300 text-2xl sm:text-3xl 
-              md:text-4xl font-bold focus:outline-none focus:border-gray-500`}
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          {data && <NoteTitle noteId={noteId!} initialTitle={data.note.title} />}
         </div>
 
         {!!todos.length && (
