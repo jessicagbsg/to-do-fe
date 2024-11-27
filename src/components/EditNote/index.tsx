@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "../ui/checkbox";
 
 type Props = {
   note: NoteModel;
@@ -25,15 +26,7 @@ export const EditNote = ({ note }: Props) => {
                 todo.done && "line-through text-muted-foreground opacity-50"
               )}
             >
-              <input
-                type="checkbox"
-                checked={todo.done}
-                readOnly
-                className={`peer shrink-0 rounded-sm border border-primary cursor-pointer
-                  shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
-                  disabled:cursor-not-allowed disabled:opacity-90 data-[state=checked]:bg-primary 
-                  data-[state=checked]:text-primary-foreground`}
-              />
+              <Checkbox checked={todo.done} className="cursor-pointer" />
               <p className="text-sm text-muted-fore line-clamp-1">{todo.title}</p>
             </div>
           ))}

@@ -92,3 +92,8 @@ body,
     background: #888;
   }
 }
+
+input[type="checkbox"]:checked {
+  background-color: #737373;
+  border-color: #737373;
+}
