@@ -17,7 +17,7 @@ export const NoteTitle = ({ noteId, initialTitle }: NoteTitleProps) => {
   const debouncedUpdateNoteTitle = useCallback(
     debounce((newTitle) => {
       updateNoteTitle({ variables: { id: noteId, title: newTitle } });
-    }, 300),
+    }, 500),
     [noteId, updateNoteTitle]
   );
 

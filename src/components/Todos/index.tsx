@@ -47,7 +47,7 @@ export const Todos = ({ filter, noteId }: Props) => {
         } catch (error) {
           console.error("Error updating todo title:", error);
         }
-      }, 300),
+      }, 500),
     [updateTodoTitle]
   );
 
