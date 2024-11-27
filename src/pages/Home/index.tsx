@@ -2,12 +2,28 @@ import { PlusCircle, Search, Trash } from "lucide-react";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@apollo/client";
+import { useState, useMemo } from "react";
+import debounce from "lodash/debounce";
 import { Input, Button, EditNote } from "@/components";
 import { CREATE_NOTE, DELETE_NOTE, FETCH_NOTES, NotesQuery } from "@/graphql";
 
 export const Home = () => {
   const navigate = useNavigate();
-  const { loading, error, data } = useQuery<NotesQuery>(FETCH_NOTES);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const debouncedHandleSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setDebouncedSearch(value);
+      }, 300),
+    []
+  );
+
+  const { loading, error, data } = useQuery<NotesQuery>(FETCH_NOTES, {
+    variables: { title: debouncedSearch },
+    fetchPolicy: "network-only",
+  });
 
   const [createNote] = useMutation(CREATE_NOTE, {
     refetchQueries: [{ query: FETCH_NOTES }],
@@ -38,6 +54,12 @@ export const Home = () => {
     }
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    debouncedHandleSearch(value);
+  };
+
   if (error) return <p>Error: {error.message}</p>;
 
   return (
@@ -53,8 +75,16 @@ export const Home = () => {
           </Button>
         </div>
         <div className="w-full my-5 md:w-1/4 self-end">
-          <Search className="absolute text-muted-foreground h-5 w-5 ml-2 mt-2" />
-          <Input type="text" placeholder="Search notes by title" className="pl-10 max-w-sm" />
+          <div className="relative">
+            <Search className="absolute text-muted-foreground h-5 w-5 ml-2 mt-2" />
+            <Input
+              type="text"
+              placeholder="Search notes by title"
+              className="pl-10 max-w-sm"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
         </div>
 
         {loading && (

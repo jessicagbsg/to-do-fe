@@ -5,8 +5,8 @@ export type NotesQuery = {
 };
 
 export const FETCH_NOTES = gql`
-  query FetchAllNotes {
-    notes {
+  query FetchAllNotes($title: String) {
+    notes(title: $title) {
       title
       id
       todos {

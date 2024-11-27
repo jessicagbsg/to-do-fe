@@ -28,9 +28,8 @@ export const EditNote = ({ note }: Props) => {
               <input
                 type="checkbox"
                 checked={todo.done}
-                onClick={() => console.log("clicked")}
-                onChange={() => console.log("changed")}
-                className={`peer shrink-0 rounded-sm border border-primary 
+                readOnly
+                className={`peer shrink-0 rounded-sm border border-primary cursor-pointer
                   shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
                   disabled:cursor-not-allowed disabled:opacity-90 data-[state=checked]:bg-primary 
                   data-[state=checked]:text-primary-foreground`}
