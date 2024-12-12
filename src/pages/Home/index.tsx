@@ -20,7 +20,7 @@ export const Home = () => {
     []
   );
 
-  const { loading, error, data } = useQuery<NotesQuery>(FETCH_NOTES, {
+  const { loading, error, data, refetch } = useQuery<NotesQuery>(FETCH_NOTES, {
     variables: { title: debouncedSearch },
     fetchPolicy: "network-only",
   });
@@ -35,7 +35,7 @@ export const Home = () => {
   });
 
   const [deleteNote] = useMutation(DELETE_NOTE, {
-    refetchQueries: [{ query: FETCH_NOTES }],
+    onCompleted: () => refetch(),
   });
 
   const handleCreateNote = async () => {
